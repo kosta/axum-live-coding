@@ -51,3 +51,13 @@ fn hello_status_code_json() {
         (StatusCode::CREATED, Json(full_name))
     }
 }
+
+fn hello_put_json() {
+    /// http --json PUT localhost:3000/hello surname=Welke first_name=Kosta something=something
+
+    async fn put_hello(Json(full_name): Json<FullName>) -> (StatusCode, Json<FullName>) {
+        (StatusCode::CREATED, Json(full_name))
+    }
+
+    router.route("/hello", put(put_hello))
+}
