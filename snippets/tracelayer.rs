@@ -1,4 +1,13 @@
 /// https://docs.rs/axum/latest/axum/middleware/index.html#applying-multiple-middleware
+use anyhow::Result;
+use axum::{routing::get, Router};
+use tower::ServiceBuilder;
+use tower_http::{
+    trace::{DefaultMakeSpan, DefaultOnRequest, DefaultOnResponse, TraceLayer},
+    LatencyUnit,
+};
+use tracing::{info, Level};
+use tracing_subscriber::{filter::LevelFilter, fmt, prelude::*, EnvFilter};
 
 fn one() {
     router.layer(

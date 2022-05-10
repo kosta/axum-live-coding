@@ -1,11 +1,6 @@
 use anyhow::Result;
 use axum::{routing::get, Router};
-use tower::ServiceBuilder;
-use tower_http::{
-    trace::{DefaultMakeSpan, DefaultOnRequest, DefaultOnResponse, TraceLayer},
-    LatencyUnit,
-};
-use tracing::{info, Level};
+use tracing::info;
 use tracing_subscriber::{filter::LevelFilter, fmt, prelude::*, EnvFilter};
 
 #[tokio::main]
