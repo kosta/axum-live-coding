@@ -9,6 +9,14 @@ use tower_http::{
 use tracing::{info, Level};
 use tracing_subscriber::{filter::LevelFilter, fmt, prelude::*, EnvFilter};
 
+fn json_output() {
+    /// https://docs.rs/tracing-subscriber/latest/tracing_subscriber/fmt/struct.Layer.html
+
+    fn json() {
+        tracing_subscriber::registry().with(fmt::layer().event_format(fmt::format().json()))
+    }
+}
+
 fn one() {
     router.layer(
         ServiceBuilder::new()
