@@ -19,3 +19,7 @@ tower = "0.4.12"
 tower-http = { version = "0.3.3", features = ["trace", "catch-panic"] }
 tracing = "0.1.34"
 tracing-subscriber = { version = "0.3.11", features = ["env-filter", "fmt", "json"] }
+
+[profile.release]
+debug = 1 # "1: line tables only", cf https://doc.rust-lang.org/cargo/reference/profiles.html
+# lto = "thin"
