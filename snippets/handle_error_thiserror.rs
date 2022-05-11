@@ -11,6 +11,8 @@ enum HttpError {
 
 impl IntoResponse for HttpError {
     fn into_response(self) -> axum::response::Response {
+        error!("Caught HttpError: {}", self);
+
         let error_message = match self {
             HttpError::BsonSerialization(_) => "serialization error",
             HttpError::Mongo(_) => "database error",
