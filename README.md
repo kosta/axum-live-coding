@@ -3,15 +3,13 @@
 # TODO
 
 * Swagger / Doku
-* Add records to spans
 * Jaeger tracing
 * Streaming insert / output
-* Circuit Braker
+* Circuit Breaker
 * Exponential Backoff
 * Message Broker
 * Service Mesh ? Istio
 * Domain Driven Design / Clean architecture / Hexagonal Architecture / Cloud Ready / 12 factor
-* ORM
 
 ## Testing
 
@@ -47,7 +45,7 @@ anyhow or snafu. Don't forget feature `backtraces`. Or just use snafu
 
 see `snippets/non_send_handlers.rs`
 
-## Authentication Middleware
+## Authentication Middleware (and adding a record to a tracing span)
 
 see https://docs.rs/axum/latest/axum/middleware/index.html
 

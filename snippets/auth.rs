@@ -18,6 +18,34 @@ fn from_fn() {
     router.layer(axum::middleware::from_fn(authenticate));
 }
 
+fn from_fn_with_extension() {
+    async fn authenticate<B>(
+        mut req: Request<B>,
+        next: Next<B>,
+    ) -> Result<axum::response::Response, (StatusCode, &'static str)> {
+        let authorization_header = req
+            .headers()
+            .get(http::header::AUTHORIZATION)
+            .map(|header| header.as_bytes());
+
+        let user = match authorization_header {
+            Some(header) if &header == b"admin=1" => Ok(User { admin: true }),
+            Some(header) if &header == b"admin=0" => Ok(User { admin: false }),
+            Some(_) => Err((
+                StatusCode::UNAUTHORIZED,
+                "Invalid Authorization header value",
+            )),
+            _ => Err((StatusCode::UNAUTHORIZED, "Missing Authorization header")),
+        }?;
+
+        Span::current().record("admin", &user.admin);
+        req.extensions_mut().insert(user);
+        Ok(next.run(req).await)
+    }
+
+    async fn hello_name(Path(name): Path<String>, user: Extension<User>) -> String;
+}
+
 fn from_extractor() {
     struct User {
         admin: bool,
@@ -49,4 +77,19 @@ fn from_extractor() {
     }
 
     router.layer(axum::middleware::from_extractor::<User>())
+}
+
+fn with_span() {
+    TraceLayer.make_span_with(|request: &Request<_>| {
+        tracing::span!(
+            Level::INFO,
+            "request",
+            method = %request.method(),
+            uri = %request.uri(),
+            version = ?request.version(),
+            admin = Empty,
+        )
+    });
+
+    Span::current().record("admin", &user.admin);
 }

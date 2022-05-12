@@ -13,7 +13,7 @@ fn json_output() {
     /// https://docs.rs/tracing-subscriber/latest/tracing_subscriber/fmt/struct.Layer.html
 
     fn json() {
-        tracing_subscriber::registry().with(fmt::layer().event_format(fmt::format().json()))
+        tracing_subscriber::registry().with(fmt::layer().json().with_span_list(false))
     }
 }
 
