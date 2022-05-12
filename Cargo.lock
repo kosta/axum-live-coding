@@ -113,9 +113,11 @@ name = "axum-live-coding"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
  "axum",
  "axum-macros",
  "backtrace",
+ "hyper",
  "mongodb",
  "serde",
  "serde_json",
