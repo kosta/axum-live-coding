@@ -3,9 +3,7 @@
 # TODO
 
 * Streaming insert / output
-* Message Broker
 * Service Mesh ? Istio
-* Domain Driven Design / Clean architecture / Hexagonal Architecture / Cloud Ready / 12 factor
 
 ## Testing
 
@@ -88,6 +86,11 @@ e.g.
         })
 ```
 
+## Configuration
+
+* [envconfig](https://crates.io/crates/envconfig) Very simple from environment only
+* [config](https://crates.io/crates/config) Layered, read from (multiple) config files plus env etc.
+
 ## Exponential Backoff
 
 [backoff](https://crates.io/crates/backoff)
@@ -118,3 +121,8 @@ No experience, possible venues:
 * [Diesel](https://crates.io/crates/diesel)
 * [SeaORM](https://crates.io/crates/sea-orm)
 * [ormx](https://crates.io/crates/ormx)
+
+## Architecture
+
+* [12 factor](https://12factor.net/)
+* [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
