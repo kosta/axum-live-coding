@@ -2,11 +2,7 @@
 
 # TODO
 
-* Swagger / Doku
-* Jaeger tracing
 * Streaming insert / output
-* Circuit Breaker
-* Exponential Backoff
 * Message Broker
 * Service Mesh ? Istio
 * Domain Driven Design / Clean architecture / Hexagonal Architecture / Cloud Ready / 12 factor
@@ -75,10 +71,50 @@ where
 router.from_extractor::<User>()
 ```
 
+## Graceful shutdown
+
+* hyper: https://docs.rs/hyper/0.14.18/hyper/server/struct.Server.html#method.with_graceful_shutdown
+
+* signal handling: https://docs.rs/tokio/latest/tokio/signal/index.html
+
+e.g.
+
+```rust
+        server.with_graceful_shutdown(async {
+            let _ = tokio::signal::ctrl_c()
+                .await
+                .map_err(|e| error!("Error waiting for ctrl-c: {}", e));
+            warn!("Shutting down...");
+        })
+```
+
+## Exponential Backoff
+
+[backoff](https://crates.io/crates/backoff)
+
+## Opentelemetry
+
+tracing integration: https://crates.io/crates/tracing-opentelemetry
+
+## OpenAPI / Swagger
+
+* By annotating the handler functions https://github.com/juhaku/utoipa/blob/master/examples/todo-axum/src/main.rs#L132
+* Run example, then navigate to http://127.0.0.1:8080/swagger-ui/#/todo/create_todo
+* Integration might improve someday? https://github.com/tokio-rs/axum/issues/50
+* Other frameworks might be better at this? (warp, rocket)
+
+## Circuit Breaker
+
+No experience, possible venues:
+
+* [recloser](https://crates.io/recloser)
+* [failsafe](https://crates.io/failsafe)
+* [crius](https://crates.io/crius)
+
 ## ORM
 
 No experience, possible venues:
 
 * [Diesel](https://crates.io/crates/diesel)
-* [SeaORM](https://github.com/SeaQL/sea-orm)
+* [SeaORM](https://crates.io/crates/sea-orm)
 * [ormx](https://crates.io/crates/ormx)
