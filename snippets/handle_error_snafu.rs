@@ -98,3 +98,66 @@ fn with_location_and_action_and_maybe_backtrace() {
         action: "put_hello",
     })?;
 }
+
+fn with_different_status_code() {
+    #[derive(Debug, Snafu)]
+    enum AppError {
+        #[snafu(display("serializing to bson at {location}: {source}"), context(false))]
+        BsonSerialization {
+            source: mongodb::bson::ser::Error,
+            backtrace: Backtrace,
+            location: Location,
+        },
+        #[snafu(display("mongodb at {location}: {source}"), context(false))]
+        Mongo {
+            source: mongodb::error::Error,
+            backtrace: Backtrace,
+            location: Location,
+        },
+    }
+
+    #[derive(Clone, Debug, Serialize, Deserialize)]
+    struct AppErrorBody {
+        error: &'static str,
+    }
+
+    impl IntoResponse for AppError {
+        fn into_response(self) -> axum::response::Response {
+            error!("Caught AppError {self}");
+
+            use mongodb::error::{ErrorKind, WriteError, WriteFailure};
+
+            let (status_code, message) = match self {
+                AppError::BsonSerialization { .. } => (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "bson serialization error",
+                ),
+                AppError::Mongo { source, .. } => {
+                    if let ErrorKind::Write(WriteFailure::WriteError(WriteError {
+                        code: 11000,
+                        ..
+                    })) = *source.kind
+                    {
+                        (StatusCode::CONFLICT, "conflict")
+                    } else {
+                        (StatusCode::INTERNAL_SERVER_ERROR, "mongodb error")
+                    }
+                }
+            };
+
+            (status_code, Json(AppErrorBody { error: message })).into_response()
+        }
+    }
+
+    // or db.person.createIndex({name:1}, {unique: 1})
+    database
+        .collection::<Person>("person")
+        .create_index(
+            IndexModel::builder()
+                .keys(doc! {"name": 1u32})
+                .options(IndexOptions::builder().unique(true).build())
+                .build(),
+            None,
+        )
+        .await?;
+}

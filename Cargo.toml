@@ -19,6 +19,8 @@ backoff = { version = "0.4.0", features = ["futures", "tokio"] }
 # backtraces, currently needed as backtrace handling is unstable in rust
 backtrace = "0.3.65"
 futures = "0.3.21"
+http = "0.2.7"
+hyper = "0.14.18"
 # mongodb client
 mongodb = "2.2.1"
 # http client
@@ -40,9 +42,8 @@ tower-http = { version = "0.3.3", features = ["trace", "catch-panic"] }
 tracing = "0.1.34"
 tracing-subscriber = { version = "0.3.11", features = ["env-filter", "fmt", "json"] }
 
+[dev-dependencies]
+
 [profile.release]
 debug = 1 # "1: line tables only", cf https://doc.rust-lang.org/cargo/reference/profiles.html
-
-[dev-dependencies]
-hyper = "0.14.18"
-# lto = "thin"
+lto = "thin"

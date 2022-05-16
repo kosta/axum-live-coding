@@ -119,6 +119,7 @@ dependencies = [
  "backoff",
  "backtrace",
  "futures",
+ "http",
  "hyper",
  "mongodb",
  "reqwest",
