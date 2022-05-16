@@ -10,6 +10,14 @@
 
 see https://github.com/tokio-rs/axum/blob/main/examples/testing/src/main.rs
 
+relevant snippet:
+```rust
+        let response = app
+            .oneshot(Request::builder().uri("/").body(Body::empty())?)
+            .await
+            .unwrap();
+```
+
 and snippets/testing.rs
 
 ## Catching panics

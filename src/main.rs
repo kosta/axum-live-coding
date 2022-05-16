@@ -1,27 +1,8 @@
 use std::net::{Ipv6Addr, SocketAddr};
 
-use axum::{
-    extract::Path,
-    http::StatusCode,
-    response::IntoResponse,
-    routing::{get, put},
-    Extension, Json, Router,
-};
-use mongodb::{
-    bson::{self, doc},
-    options::UpdateOptions,
-    Database,
-};
-use serde::{Deserialize, Serialize};
-use serde_json::json;
-use snafu::{Backtrace, ErrorCompat, Location, ResultExt, Snafu};
-use tower::ServiceBuilder;
-use tower_http::{
-    catch_panic::CatchPanicLayer,
-    trace::{DefaultMakeSpan, DefaultOnRequest, DefaultOnResponse, TraceLayer},
-    LatencyUnit,
-};
-use tracing::{debug, error, info, Level};
+use axum::{routing::get, Router};
+
+use tracing::info;
 use tracing_subscriber::{filter::LevelFilter, fmt, prelude::*, EnvFilter};
 
 #[tokio::main]
