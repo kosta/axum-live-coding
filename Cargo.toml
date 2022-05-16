@@ -12,6 +12,7 @@ anyhow = { version = "1.0.57", features = ["backtrace"] }
 async-trait = "0.1.53"
 # web framework
 axum = "0.5.4"
+axum-extra = { version = "0.3.2", features = ["typed-routing"] }
 # for debug_helper
 axum-macros = "0.2.0"
 # retry with exponential backoff
@@ -23,6 +24,7 @@ http = "0.2.7"
 hyper = "0.14.18"
 # mongodb client
 mongodb = "2.2.1"
+rand = "0.8.5"
 # http client
 reqwest = "0.11.10"
 # serialization / deserialization
