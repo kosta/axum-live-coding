@@ -24,6 +24,7 @@ http = "0.2.7"
 hyper = "0.14.18"
 # mongodb client
 mongodb = "2.2.1"
+path-absolutize = "3.0.13"
 rand = "0.8.5"
 # http client
 reqwest = "0.11.10"

@@ -4,17 +4,19 @@
 use std::{
     io::ErrorKind,
     net::{Ipv6Addr, SocketAddr},
-    path::PathBuf,
+    path::{Path, PathBuf},
+    str::from_utf8,
 };
 
 use axum::{
-    extract::Path,
+    middleware::{self, Next},
     response::{Html, IntoResponse},
     routing::get,
-    Json, Router,
+    Extension, Json, Router,
 };
 use axum_macros::debug_handler;
-use http::StatusCode;
+use http::{Request, StatusCode};
+use path_absolutize::Absolutize;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use snafu::{Location, ResultExt, Snafu};
@@ -22,22 +24,26 @@ use tokio::{fs::File, io::AsyncReadExt};
 use tower_http::catch_panic::CatchPanicLayer;
 use tracing::{error, info};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 struct Person {
-    first_name: String,
-    last_name: String,
+    name: String,
 }
 
 #[derive(Debug, Snafu)]
 enum AppError {
     #[snafu(display("io at {location} reading {path:?}: {source}"))]
     Io {
-        path: PathBuf,
+        path: Option<PathBuf>,
         source: std::io::Error,
         location: Location,
     },
+    InvalidPath {
+        path: PathBuf,
+    },
     #[snafu(display("mongodb error: {source}"))]
-    Mongo { source: mongodb::error::Error },
+    Mongo {
+        source: mongodb::error::Error,
+    },
 }
 
 impl IntoResponse for AppError {
@@ -46,6 +52,7 @@ impl IntoResponse for AppError {
 
         let (status_code, message) = match self {
             AppError::Mongo { .. } => (StatusCode::INTERNAL_SERVER_ERROR, "database error"),
+            AppError::InvalidPath { .. } => (StatusCode::BAD_REQUEST, "invalid path"),
             AppError::Io { source, .. } => {
                 if source.kind() == ErrorKind::NotFound {
                     (StatusCode::NOT_FOUND, "not found")
@@ -60,9 +67,17 @@ impl IntoResponse for AppError {
 }
 
 #[debug_handler]
-async fn hello(Path(person): Path<Person>) -> Result<Html<String>, AppError> {
+async fn hello(Extension(Person { name }): Extension<Person>) -> Result<Html<String>, AppError> {
+    let root = Path::new("greetings");
+    let name = Path::new(&name);
+    let path = name
+        .absolutize_virtually(root)
+        .map_err(|_| AppError::InvalidPath {
+            path: name.to_path_buf(),
+        })?
+        .to_path_buf();
+
     let mut greeting = String::new();
-    let path = PathBuf::from("greetings").join(person.first_name);
     let mut file = File::open(&path)
         .await
         .with_context(|_| IoSnafu { path: path.clone() })?;
@@ -72,13 +87,32 @@ async fn hello(Path(person): Path<Person>) -> Result<Html<String>, AppError> {
     Ok(Html(greeting))
 }
 
+async fn authenticate<B>(mut request: Request<B>, next: Next<B>) -> impl IntoResponse {
+    let authorization_header = request.headers().get(http::header::AUTHORIZATION);
+    let name = match authorization_header {
+        Some(value) => {
+            let name = from_utf8(value.as_bytes());
+            match name {
+                Ok(name) => name.to_string(),
+                Err(_) => return Err((StatusCode::FORBIDDEN, "bad Authorization header value")),
+            }
+        }
+        None => return Err((StatusCode::UNAUTHORIZED, "missing Authorization header")),
+    };
+    request.extensions_mut().insert(Person {
+        name: name.to_string(),
+    });
+    Ok(next.run(request).await)
+}
+
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
     tracing_subscriber::fmt::init();
 
     let app = Router::new()
         .route("/hello/:first_name/:last_name", get(hello))
-        .layer(CatchPanicLayer::new());
+        .layer(CatchPanicLayer::new())
+        .layer(middleware::from_fn(authenticate));
 
     let listening_address = SocketAddr::from((Ipv6Addr::UNSPECIFIED, 3000));
     info!("Listening on {listening_address}");
