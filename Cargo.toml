@@ -18,6 +18,7 @@ axum-macros = "0.2.0"
 backoff = { version = "0.4.0", features = ["futures", "tokio"] }
 # backtraces, currently needed as backtrace handling is unstable in rust
 backtrace = "0.3.65"
+futures = "0.3.21"
 # mongodb client
 mongodb = "2.2.1"
 # http client
@@ -30,6 +31,8 @@ serde_json = "1.0.81"
 snafu = { version = "0.7.1", features = ["backtraces"] }
 # async runtime, needed to execute any async function
 tokio = { version = "1.18.2", features = ["full"] }
+tokio-stream = { version = "0.1.8", features = ["io-util"] }
+tokio-util = { version = "0.7.2", features = ["io"] }
 # provides a service trait and implementations that can be used as axum middleware
 tower = "0.4.12"
 tower-http = { version = "0.3.3", features = ["trace", "catch-panic"] }

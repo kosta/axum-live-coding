@@ -2,10 +2,6 @@
 
 [Slides](https://docs.google.com/presentation/d/1ME9Nfgzkupof5wWTUFGRjNXx8jPGKmB-LOx2DkfX96s/)
 
-# TODO
-
-* Streaming insert / output
-
 ## Testing
 
 see https://github.com/tokio-rs/axum/blob/main/examples/testing/src/main.rs
@@ -103,6 +99,14 @@ e.g.
 ## Exponential Backoff
 
 [backoff](https://crates.io/crates/backoff)
+
+## Streaming Body (request & response)
+
+```sh
+mkfifo lines.txt
+resources/list.sh > lines.txt &
+curl --upload-file lines.txt -X PUT localhost:3000/reverse-lines
+```
 
 ## Opentelemetry
 
