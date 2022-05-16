@@ -1,21 +1,11 @@
-use std::net::{Ipv6Addr, SocketAddr};
-
 use axum::{routing::get, Router};
-
+use std::net::{Ipv6Addr, SocketAddr};
 use tracing::info;
-use tracing_subscriber::{filter::LevelFilter, fmt, prelude::*, EnvFilter};
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
-    //initialize tracing
-    tracing_subscriber::registry()
-        .with(fmt::layer())
-        .with(
-            EnvFilter::builder()
-                .with_default_directive(LevelFilter::INFO.into())
-                .from_env_lossy(),
-        )
-        .init();
+    //initialize tracing / logging
+    tracing_subscriber::fmt::init();
 
     // build our application
     let app = Router::new().route("/", get(|| async { "Hello, World!" }));
