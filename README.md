@@ -1,6 +1,6 @@
 # Live coding a rust microservice
 
-[Slides](https://docs.google.com/presentation/d/1ME9Nfgzkupof5wWTUFGRjNXx8jPGKmB-LOx2DkfX96s/)
+[Slides](Karlsruher Entwicklertag - Live-coding a rust microservice.pdf)
 
 ## Testing
 
